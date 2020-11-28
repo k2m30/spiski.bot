@@ -2,6 +2,8 @@ defmodule App.Actions do
   @moduledoc false
 
   require Logger
+  use App.Commander
+
 
   def search(id, q) do
     query = q
@@ -31,24 +33,133 @@ defmodule App.Actions do
     new_state
     |> IO.inspect
 
-    markup(id, results[query])
+    markup(id, query, results[query])
   end
 
   def wanna_add_new_fields() do
-
+    {"wanna_add_new_fields", []}
   end
 
   def wanna_add_person() do
+    {"wanna_add_person", []}
+  end
+
+  defp markup(id, query, []) do
+    State.update_stage(id, "not_found")
+    {
+      "На текущий момент информации о задержании человека по фамилии <b>\"#{
+        query
+      }\"</b> нет. Если вы уверены, что это не так, напишите нам об этом",
+      parse_mode: 'HTML',
+      reply_markup: %Model.InlineKeyboardMarkup{
+        inline_keyboard: [
+          [
+            %{
+              callback_data: "/fill_form",
+              text: "Сообщить о задержании",
+              url: "https://docs.google.com/forms/d/e/1FAIpQLScpSOicLFqYdzJO3UeHtnFJy8RWdDM0YvHVev_tNZdXqIuhNQ/viewform"
+            }
+          ],
+          [
+            %{
+              callback_data: "/search",
+              text: "Обновить поиск"
+            }
+          ],
+          [
+            %{
+              callback_data: "/restart",
+              text: "Ввести другую фамилию"
+            }
+          ]
+        ]
+      }
+    }
+
 
   end
 
-  defp markup(id, []) do
-    State.update_stage(id, "not_found")
-    {"Информации о задержании такого человека нет. Если вы уверены, что это не так, напишите нам об этом", []}
+  defp markup(id, query, results) do
+    State.update_stage(id, "found")
+    {
+      make_pretty(query, results),
+      parse_mode: 'HTML',
+      reply_markup: %Model.InlineKeyboardMarkup{
+        inline_keyboard: [
+          [
+            %{
+              callback_data: "/fill_form",
+              text: "Сообщить новую информацию",
+              url: "https://docs.google.com/forms/d/e/1FAIpQLScpSOicLFqYdzJO3UeHtnFJy8RWdDM0YvHVev_tNZdXqIuhNQ/viewform"
+#              url: "https://docs.google.com/forms/d/e/1FAIpQLScpSOicLFqYdzJO3UeHtnFJy8RWdDM0YvHVev_tNZdXqIuhNQ/viewform?usp=pp_url&entry.22906134=name&entry.1856883854=year&entry.1650477813=date"
+            }
+          ],
+          [
+            %{
+              callback_data: "/search",
+              text: "Обновить поиск"
+            }
+          ],
+          [
+            %{
+              callback_data: "/restart",
+              text: "Ввести другую фамилию"
+            }
+          ]
+        ]
+      }
+    }
+
   end
 
-  defp markup(id, results) do
-    State.update_stage(id, "not_found")
-    {"Информации о задержании такого человека нет. Если вы уверены, что это не так, напишите нам об этом", []}
+  defp make_pretty(query, results) do
+
+    m = Enum.reduce results, "#{query}:\n\n", fn person, message ->
+      message = message <> person["ФИО"] <> "\n"
+
+      message = if person["Дата задержания"] != "" do
+        message <> "Задержан: <b>#{person["Дата задержания"]}</b>\n\n"
+      else
+        message
+      end
+
+      message = if person["Год"] != "" do
+        message <> "Год или дата рождения: #{person["Год"]}\n"
+      else
+        message <> "Год или дата рождения: неизвестно\n"
+      end
+
+      message = if person["Сводка"] != "" do
+        message <> "Что известно: #{person["Сводка"]}\n"
+      else
+        message <> "Что известно: поступила информация о задержании, ждём дополнительной информации. Как только что-то будет известно, информация отобразится здесь или на сайте.\n"
+      end
+
+      message = if person["Суд, судья, приговор"] != "" or person["Сутки"] != "" do
+        message <> "Суд, судья, приговор: #{person["Суд, судья, приговор"]} #{person["Сутки"]} #{person["Штраф"]}\n"
+      else
+        message
+      end
+
+      message = if person["Отпустили"] != "" do
+        message <> "Дополнительная информация: #{person["Отпустили"]}\n"
+      else
+        message
+      end
+
+
+      message = if person["Дата выхода"] != "" do
+        message <> "Дата выхода: #{person["Дата выхода"]} #{person["Время выхода"]}\n"
+      else
+        message
+      end
+
+      message = message <> "__________________________\n\n"
+      message
+    end
+
+    m
+    |> Logger.warn
+    m
   end
 end
