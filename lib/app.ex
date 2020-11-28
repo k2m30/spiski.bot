@@ -5,10 +5,12 @@ defmodule App do
     bot_name = Application.get_env(:app, :bot_name)
 
     unless String.valid?(bot_name) do
-      IO.warn("""
-      Env not found Application.get_env(:app, :bot_name)
-      This will give issues when generating commands
-      """)
+      IO.warn(
+        """
+        Env not found Application.get_env(:app, :bot_name)
+        This will give issues when generating commands
+        """
+      )
     end
 
     if bot_name == "" do
@@ -19,7 +21,8 @@ defmodule App do
 
     children = [
       worker(App.Poller, []),
-      worker(App.Matcher, [])
+      worker(App.Matcher, []),
+      {Redix, name: :redix}
     ]
 
     opts = [strategy: :one_for_one, name: App.Supervisor]

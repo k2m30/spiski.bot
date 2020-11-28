@@ -69,7 +69,7 @@ Let's take a look at the `get_chat_id/2` definitions:
 
 If you ever used telegram bot API you may have experienced issues trying to find
 where is the chat ID for the current update. That's solves it under the hood in
-this boilerplate for you. Read more about it at [App.Commands](lib/app/commands.ex).
+this boilerplate for you. Read more about it at [App.Commands](lib/app/commands_base_.ex).
 
 ### Matcher macros
 
