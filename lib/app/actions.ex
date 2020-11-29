@@ -4,6 +4,39 @@ defmodule App.Actions do
   require Logger
   use App.Commander
 
+  @form_url "https://docs.google.com/forms/d/e/1FAIpQLScpSOicLFqYdzJO3UeHtnFJy8RWdDM0YvHVev_tNZdXqIuhNQ/viewform"
+
+  @default_markup  %Model.InlineKeyboardMarkup{
+    inline_keyboard: [
+      [
+        %{
+          callback_data: "/fill_form",
+          text: "Сообщить новую информацию",
+          url: @form_url
+          #              url: "https://docs.google.com/forms/d/e/1FAIpQLScpSOicLFqYdzJO3UeHtnFJy8RWdDM0YvHVev_tNZdXqIuhNQ/viewform?usp=pp_url&entry.22906134=name&entry.1856883854=year&entry.1650477813=date"
+        }
+      ],
+      [
+        %{
+          callback_data: "/search",
+          text: "Обновить поиск"
+        }
+      ],
+      [
+        %{
+          callback_data: "/speed_up",
+          text: "Ускорить процесс"
+        }
+      ],
+      [
+        %{
+          callback_data: "/restart",
+          text: "Ввести другую фамилию"
+        }
+      ]
+    ]
+  }
+
 
   def search(id, q) do
     query = q
@@ -44,6 +77,31 @@ defmodule App.Actions do
     {"wanna_add_person", []}
   end
 
+  def speed_up do
+    {
+      """
+      Как ускорить процесс:
+
+      1. Обзвоните РУВД <a href="http://0908help.tilda.ws/ruvd" target="_blank">по телефонам</a>. Некоторую информацию сообщают только родным. Там будет постоянно занято, но у вас всё получится
+
+      2. Просто звоните 102, если прошло больше суток
+
+      3. Фотографии списков <a href="https://t.me/spiski_okrestina" target="_blank">на канале </a> появляются на несколько часов раньше, чем попадают к боту или на <a href="http://spiski.live" target="_blank">сайт</a>
+
+      4. Если человек до суда был в ИВС или ЦИП, то решение суда можно узнать лично <a href="http://0908help.tilda.ws/sudy" target="_blank">в канцелярии</a> в тот же день. Район суда совпадает с районом РУВД, куда отвезли задержанного. Из Октябрьского РУВД будут судить в суде Октябрьского района
+
+      Решения судов в Жодино появляются <a href="https://t.me/spiski_okrestina" target="_blank">на канале</a>, в базе бота и на <a href="http://spiski.live" target="_blank">сайте</a> на следующий день (иногда через день) после вынесения решения
+
+      5. Узнать, где человек будет сидеть сутки, можно на следующий день (иногда через день) после решения суда у бота, на <a href="http://spiski.live" target="_blank">сайте</a> или <a href="https://t.me/spiski_okrestina" target="_blank">на канале</a>
+
+      6. Если вы узнали что-то самостоятельно, сообщите об этом волонтёрам через <a href="#{@form_url}" target="_blank">форму</a>
+      """,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true,
+      reply_markup: @default_markup
+    }
+  end
+
   defp markup(id, query, []) do
     State.update_stage(id, "not_found")
     {
@@ -57,7 +115,7 @@ defmodule App.Actions do
             %{
               callback_data: "/fill_form",
               text: "Сообщить о задержании",
-              url: "https://docs.google.com/forms/d/e/1FAIpQLScpSOicLFqYdzJO3UeHtnFJy8RWdDM0YvHVev_tNZdXqIuhNQ/viewform"
+              url: @form_url
             }
           ],
           [
@@ -84,30 +142,7 @@ defmodule App.Actions do
     {
       make_pretty(query, results),
       parse_mode: 'HTML',
-      reply_markup: %Model.InlineKeyboardMarkup{
-        inline_keyboard: [
-          [
-            %{
-              callback_data: "/fill_form",
-              text: "Сообщить новую информацию",
-              url: "https://docs.google.com/forms/d/e/1FAIpQLScpSOicLFqYdzJO3UeHtnFJy8RWdDM0YvHVev_tNZdXqIuhNQ/viewform"
-#              url: "https://docs.google.com/forms/d/e/1FAIpQLScpSOicLFqYdzJO3UeHtnFJy8RWdDM0YvHVev_tNZdXqIuhNQ/viewform?usp=pp_url&entry.22906134=name&entry.1856883854=year&entry.1650477813=date"
-            }
-          ],
-          [
-            %{
-              callback_data: "/search",
-              text: "Обновить поиск"
-            }
-          ],
-          [
-            %{
-              callback_data: "/restart",
-              text: "Ввести другую фамилию"
-            }
-          ]
-        ]
-      }
+      reply_markup: @default_markup
     }
 
   end

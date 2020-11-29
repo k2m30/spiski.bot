@@ -11,9 +11,6 @@ defmodule App.Commands do
     {:ok, _} =
       send_message(
         "Введите фамилию для поиска:",
-        # Nadia.Model is aliased from App.Commander
-        #
-        # See also: https://hexdocs.pm/nadia/Nadia.Model.InlineKeyboardMarkup.html
         reply_markup: %Model.ForceReply{
           force_reply: true
         }
@@ -29,9 +26,6 @@ defmodule App.Commands do
     {:ok, _} =
       send_message(
         "Введите фамилию для поиска:",
-        # Nadia.Model is aliased from App.Commander
-        #
-        # See also: https://hexdocs.pm/nadia/Nadia.Model.InlineKeyboardMarkup.html
         reply_markup: %Model.ForceReply{
           force_reply: true
         }
@@ -49,7 +43,21 @@ defmodule App.Commands do
     send_message(message, opts)
   end
 
+  callback_query_command "speed_up" do
+    Logger.log(:info, "Callback Query Command /speed_up")
 
+    {message, opts} = App.Actions.speed_up
+    send_message(message, opts)
+  end
+
+
+  callback_query_command "fill_form" do
+    Logger.log(:info, "Callback Query Command /fill_form")
+  end
+
+  callback_query do
+    Logger.log(:warn, "Did not match any callback query")
+  end
 
 
   # The `message` macro must come at the end since it matches anything.
@@ -65,8 +73,8 @@ defmodule App.Commands do
 
       {message, opts} = case State.get(id).stage do
         "started" -> App.Actions.search(id, update.message.text)
-        "found" -> App.Actions.wanna_add_new_fields
-        "not_found" -> App.Actions.wanna_add_person
+        #        "found" -> App.Actions.wanna_add_new_fields
+        #        "not_found" -> App.Actions.wanna_add_person
         _ -> Logger.log(:error, "Did not match stage"); {"Выберите доступные варианты", []}
       end
 
