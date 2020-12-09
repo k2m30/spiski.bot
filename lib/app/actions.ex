@@ -42,6 +42,8 @@ defmodule App.Actions do
     query = q
             |> String.split(",")
             |> List.first
+            |> String.split(" ")
+            |> List.first
             |> String.trim
             |> String.capitalize
 
@@ -94,7 +96,9 @@ defmodule App.Actions do
 
       5. Узнать, где человек будет сидеть сутки, можно на следующий день (иногда через день) после решения суда у бота, на <a href="http://spiski.live" target="_blank">сайте</a> или <a href="https://t.me/spiski_okrestina" target="_blank">на канале</a>
 
-      6. Если вы узнали что-то самостоятельно, сообщите об этом волонтёрам через <a href="#{@form_url}" target="_blank">форму</a>
+      6. Если вы узнали что-то самостоятельно, сообщите об этом волонтёрам через <a href="#{
+        @form_url
+      }" target="_blank">форму</a>
       """,
       parse_mode: 'HTML',
       disable_web_page_preview: true,

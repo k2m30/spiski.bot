@@ -16,7 +16,7 @@ defmodule App.Mixfile do
 
   def application do
     [
-      extra_applications: [:logger, :nadia, :poison, :redix],
+      extra_applications: [:logger, :logger_file_backend, :nadia, :poison, :redix],
       mod: {App, []}
     ]
   end
@@ -27,7 +27,8 @@ defmodule App.Mixfile do
       {:poison, "~> 3.1"},
       {:redix, ">= 0.0.0"},
       {:castore, ">= 0.0.0"},
-      {:httpoison, "~> 1.6.2"}
+      {:httpoison, "~> 1.6.2"},
+      {:logger_file_backend, "~> 0.0.11"}
     ]
   end
 
