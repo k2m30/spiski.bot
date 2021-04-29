@@ -4,8 +4,8 @@ defmodule App.Mixfile do
   def project do
     [
       app: :app,
-      version: "0.1.0",
-      elixir: "~> 1.3",
+      version: "1.0.2",
+      elixir: ">= 1.7.2",
       default_task: "server",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -16,19 +16,20 @@ defmodule App.Mixfile do
 
   def application do
     [
-      extra_applications: [:logger, :logger_file_backend, :nadia, :poison, :redix],
+      extra_applications: [:logger, :logger_file_backend, :nadia, :poison, :redix, :jason, :logger_file_backend],
       mod: {App, []}
     ]
   end
 
-  defp deps do
+  def deps do
     [
-      {:nadia, "~> 0.6.0"},
-      {:poison, "~> 3.1"},
-      {:redix, ">= 0.0.0"},
-      {:castore, ">= 0.0.0"},
-      {:httpoison, "~> 1.6.2"},
-      {:logger_file_backend, "~> 0.0.11"}
+      {:nadia, "~> 0.7.0"},
+      {:poison, "~> 3.1.0"},
+      {:redix, "~> 1.0.0"},
+      {:castore, "~> 0.1.8"},
+      {:httpoison, "~> 1.7.0"},
+      {:logger_file_backend, "~> 0.0.11"},
+      {:distillery, "~> 2.0"}
     ]
   end
 

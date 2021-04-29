@@ -18,11 +18,10 @@ defmodule App do
     end
 
     import Supervisor.Spec, warn: false
-
     children = [
       worker(App.Poller, []),
       worker(App.Matcher, []),
-      {Redix, name: :redix}
+      worker(Redix, ["redis://#{System.get_env("REDIS_HOST")}:6379", [name: :redix, password: System.get_env("REDIS_PASSWORD")]], id: {Redix, 0})
     ]
 
     opts = [strategy: :one_for_one, name: App.Supervisor]
